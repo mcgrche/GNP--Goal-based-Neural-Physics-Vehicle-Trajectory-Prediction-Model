@@ -273,12 +273,12 @@ opencv-python>=4.5.0
 ## To-Do List
 
 ### High Priority
-- [x ] **Goal Prediction sub-module**: Codes for transformer-based goal-prediction sub-module
-- [x ] **Neural Social Force Trajectory Prediction sub-module**: Codes for neural social force including attraction and repulsive force
-- [x ] **HighD dataset Support**: Support HighD dataset and data processing 
-- [ ] **NGSIM dataset Support**: Support NGSIM dataset and data processing
-- [ ] **Repository Structure**: Improve confidence estimation for safety-critical applications
-- [ ] **Installation**: Installation and implementation detail for data preparation, training, and evaluation
+- ✅ **Goal Prediction sub-module**: Codes for transformer-based goal-prediction sub-module
+- ✅ **Neural Social Force Trajectory Prediction sub-module**: Codes for neural social force including attraction and repulsive force
+- ✅ **HighD dataset Support**: Support HighD dataset and data processing 
+- 🚧 **NGSIM dataset Support**: Support NGSIM dataset and data processing
+- 🚧 **Repository Structure**: Improve confidence estimation for safety-critical applications
+- 🚧 **Installation**: Installation and implementation detail for data preparation, training, and evaluation
 
 
 ## Contributing
