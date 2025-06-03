@@ -36,7 +36,7 @@ The GNP model consists of two main sub-modules:
 - **Vehicle Dynamics**: Numerical integration for trajectory completion
 - **Interpretable Parameters**: Learnable force coefficients with physical meaning
 
-![Model Architecture](docs/figures/model_architecture.png)
+![Model Architecture](assets/framework_v2.png)
 
 *Figure 1: GNP model architecture with dual sub-module framework*
 
