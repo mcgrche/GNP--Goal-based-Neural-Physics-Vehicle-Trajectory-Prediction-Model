@@ -280,27 +280,6 @@ opencv-python>=4.5.0
 - 🚧 **Repository Structure**: Improve confidence estimation for safety-critical applications
 - 🚧 **Installation**: Installation and implementation detail for data preparation, training, and evaluation
 
-
-## Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Development Setup
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Install pre-commit hooks
-pre-commit install
-
-# Run tests
-python -m pytest tests/
-
-# Run linting
-flake8 src/
-black src/
-```
-
 ## Citation
 
 If you use this code in your research, please cite our paper:
@@ -308,22 +287,15 @@ If you use this code in your research, please cite our paper:
 ```bibtex
 @article{gan2024goal,
   title={Goal-based Neural Physics Vehicle Trajectory Prediction Model},
-  author={Gan, Rui and Shi, Haotian and Li, Pei and Wu, Keshu and An, Bocheng and You, Junwei and Li, Linheng and Ma, Junyi and Ma, Chengyuan and Ran, Bin},
-  journal={Transportation Research Part C: Emerging Technologies},
-  year={2024},
-  publisher={Elsevier}
+  author={Gan, Rui and Shi, Haotian and Li, Pei and Wu, Keshu and An, Bocheng and Li, Linheng and Ma, Junyi and Ma, Chengyuan and Ran, Bin},
+  journal={arXiv preprint arXiv:2409.15182},
+  year={2024}
 }
 ```
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Traffic Operations and Safety (TOPS) Laboratory at University of Wisconsin-Madison
-- HighD and NGSIM dataset providers
-- Open-source trajectory prediction community
 
 ## Contact
 
@@ -335,7 +307,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **2024-06-01**: Initial repository setup and model implementation
 - **2024-06-01**: Added comprehensive documentation and examples
-- **2024-06-01**: Released pre-trained models for HighD and NGSIM datasets
 
 ---
 
