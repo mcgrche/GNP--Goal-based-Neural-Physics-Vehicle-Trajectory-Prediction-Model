@@ -27,8 +27,7 @@ The GNP model consists of two main sub-modules:
 ### 1. Goal Prediction Sub-module
 - **Intention Mode Extraction**: Clusters trajectory patterns to identify driving intentions
 - **Transformer Encoder-Decoder**: Enhanced architecture for goal prediction
-- **Multi-head Attention**: Captures temporal and spatial dependencies
-- **Top-K Goal Sampling**: Generates multiple potential destinations
+- **Top-K Goal Sampling**: Generates multiple potential destinations and their probabilities
 
 ### 2. Trajectory Prediction Sub-module (Neural Social Force)
 - **Goal Attraction Force**: Neural network-learned attraction towards predicted goals
@@ -39,6 +38,64 @@ The GNP model consists of two main sub-modules:
 ![Model Architecture](assets/framework_v2.png)
 
 *Figure 1: GNP model architecture with dual sub-module framework*
+
+## Quick Start
+
+### 1. Data Preparation
+
+```bash
+# Download and preprocess HighD dataset
+python scripts/download_data.sh --dataset highd
+python scripts/preprocess_data.py --dataset highd --output data/processed/
+
+# Extract intention modes
+python src/data/intention_clustering.py --data data/processed/highd/ --n_clusters 200
+```
+
+### 2. Training
+
+```bash
+# Train goal prediction sub-module
+python src/training/train_goal_prediction.py \
+    --data_path data/processed/highd/ \
+    --intention_modes data/intention_modes/highd_200.pkl \
+    --epochs 100 \
+    --batch_size 64 \
+    --lr 0.001
+
+# Train trajectory prediction sub-module
+python src/training/train_trajectory.py \
+    --data_path data/processed/highd/ \
+    --goal_model models/checkpoints/goal_prediction_best.pth \
+    --epochs 150 \
+    --batch_size 32 \
+    --lr 0.0005
+
+# End-to-end fine-tuning
+python src/training/train_gnp.py \
+    --data_path data/processed/highd/ \
+    --pretrained_goal models/checkpoints/goal_prediction_best.pth \
+    --pretrained_traj models/checkpoints/trajectory_prediction_best.pth \
+    --epochs 50 \
+    --batch_size 16 \
+    --lr 0.0001
+```
+
+### 3. Evaluation
+
+```bash
+# Evaluate on test set
+python scripts/evaluate_model.py \
+    --model_path models/pretrained/gnp_highd.pth \
+    --data_path data/processed/highd/test/ \
+    --output results/highd_evaluation.json
+
+# Generate visualizations
+python src/utils/visualization.py \
+    --model_path models/pretrained/gnp_highd.pth \
+    --data_path data/processed/highd/test/ \
+    --output_dir results/visualizations/
+```
 
 ## Repository Structure
 
@@ -165,100 +222,6 @@ plotly>=5.0.0
 opencv-python>=4.5.0
 ```
 
-## Quick Start
-
-### 1. Data Preparation
-
-```bash
-# Download and preprocess HighD dataset
-python scripts/download_data.sh --dataset highd
-python scripts/preprocess_data.py --dataset highd --output data/processed/
-
-# Extract intention modes
-python src/data/intention_clustering.py --data data/processed/highd/ --n_clusters 200
-```
-
-### 2. Training
-
-```bash
-# Train goal prediction sub-module
-python src/training/train_goal_prediction.py \
-    --data_path data/processed/highd/ \
-    --intention_modes data/intention_modes/highd_200.pkl \
-    --epochs 100 \
-    --batch_size 64 \
-    --lr 0.001
-
-# Train trajectory prediction sub-module
-python src/training/train_trajectory.py \
-    --data_path data/processed/highd/ \
-    --goal_model models/checkpoints/goal_prediction_best.pth \
-    --epochs 150 \
-    --batch_size 32 \
-    --lr 0.0005
-
-# End-to-end fine-tuning
-python src/training/train_gnp.py \
-    --data_path data/processed/highd/ \
-    --pretrained_goal models/checkpoints/goal_prediction_best.pth \
-    --pretrained_traj models/checkpoints/trajectory_prediction_best.pth \
-    --epochs 50 \
-    --batch_size 16 \
-    --lr 0.0001
-```
-
-### 3. Evaluation
-
-```bash
-# Evaluate on test set
-python scripts/evaluate_model.py \
-    --model_path models/pretrained/gnp_highd.pth \
-    --data_path data/processed/highd/test/ \
-    --output results/highd_evaluation.json
-
-# Generate visualizations
-python src/utils/visualization.py \
-    --model_path models/pretrained/gnp_highd.pth \
-    --data_path data/processed/highd/test/ \
-    --output_dir results/visualizations/
-```
-
-### 4. Inference
-
-```python
-import torch
-from src.models.gnp_model import GNPModel
-from src.data.data_loader import HighDDataLoader
-
-# Load pre-trained model
-model = GNPModel.load_from_checkpoint('models/pretrained/gnp_highd.pth')
-model.eval()
-
-# Load test data
-data_loader = HighDDataLoader('data/processed/highd/test/', batch_size=1)
-
-# Make predictions
-with torch.no_grad():
-    for batch in data_loader:
-        observed_trajectories = batch['observed']
-        neighboring_vehicles = batch['neighbors']
-        
-        # Predict goals
-        predicted_goals, goal_probs = model.predict_goals(
-            observed_trajectories, neighboring_vehicles
-        )
-        
-        # Generate trajectories
-        predicted_trajectories = model.predict_trajectories(
-            observed_trajectories, neighboring_vehicles, predicted_goals
-        )
-        
-        # Visualize results
-        model.visualize_forces(
-            observed_trajectories, predicted_trajectories, 
-            save_path='results/force_analysis.png'
-        )
-```
 
 ## Key Results
 
@@ -299,43 +262,6 @@ with torch.no_grad():
 ### Performance Comparison
 ![Results](docs/figures/performance_comparison.png)
 
-## Configuration
-
-Key configuration parameters in `src/utils/config.py`:
-
-```python
-# Model hyperparameters
-MODEL_CONFIG = {
-    'goal_prediction': {
-        'transformer_layers': 2,
-        'attention_heads': 4,
-        'embedding_dim': 128,
-        'n_goals': 20,
-        'n_intention_modes': 200
-    },
-    'trajectory_prediction': {
-        'lstm_hidden_dim': 64,
-        'mlp_hidden_dims': [128, 64, 32],
-        'time_steps': 50,
-        'integration_method': 'euler'
-    },
-    'social_force': {
-        'goal_force_scale': 1.0,
-        'repulsion_force_scale': 2.0,
-        'collision_radius': 2.0,
-        'lane_width': 3.5
-    }
-}
-
-# Training configuration
-TRAINING_CONFIG = {
-    'batch_size': 64,
-    'learning_rate': 0.001,
-    'weight_decay': 1e-4,
-    'scheduler': 'cosine',
-    'early_stopping_patience': 10
-}
-```
 
 ## Datasets
 
@@ -343,47 +269,17 @@ TRAINING_CONFIG = {
 - **HighD**: German highway drone recordings (25 Hz, 420m sections)
 - **NGSIM**: US highway camera data (10 Hz, I-80 & US-101)
 
-### Data Format
-```python
-# Expected input format
-{
-    'observed_trajectory': torch.Tensor,  # Shape: [batch, time_obs, 2]
-    'future_trajectory': torch.Tensor,    # Shape: [batch, time_pred, 2] 
-    'neighboring_vehicles': torch.Tensor, # Shape: [batch, n_neighbors, time_obs, 2]
-    'lane_markings': torch.Tensor,        # Shape: [batch, n_lanes, 2]
-    'vehicle_id': torch.LongTensor        # Shape: [batch]
-}
-```
-
-## Ablation Studies
-
-Component contribution analysis:
-
-| Variant | Intention Modes | Goal Force | Repulsion Force | ADE/FDE/RMSE |
-|---------|----------------|------------|-----------------|--------------|
-| w/o IM | ✗ | ✓ | ✓ | 2.21/4.02/3.53 |
-| w/o Rep | ✓ | ✓ | ✗ | 0.87/1.46/0.77 |
-| **Full GNP** | **✓** | **✓** | **✓** | **0.59/1.07/0.50** |
 
 ## To-Do List
 
 ### High Priority
-- [ ] **Multi-lane Highway Extension**: Expand to complex highway interchanges and ramps
-- [ ] **Urban Scenario Support**: Adapt model for city driving with traffic lights and intersections  
-- [ ] **Real-time Optimization**: Further reduce inference latency for deployment
-- [ ] **Uncertainty Quantification**: Improve confidence estimation for safety-critical applications
+- [ ✅] **Goal Prediction sub-module**: Codes for transformer-based goal-prediction sub-module
+- [ ✅] **Neural Social Force Trajectory Prediction sub-module**: Codes for neural social force including attraction and repulsive force
+- [ ✅] **HighD dataset Support**: Support HighD dataset and data processing 
+- [ ] **NGSIM dataset Support**: Support NGSIM dataset and data processing
+- [ ] **Repository Structure**: Improve confidence estimation for safety-critical applications
+- [ ] **Installation**: Installation and implementation detail for data preparation, training, and evaluation
 
-### Medium Priority
-- [ ] **Advanced Intention Modeling**: Explore hierarchical intention representations
-- [ ] **Enhanced Physics Model**: Develop more sophisticated potential field formulations
-- [ ] **Cross-dataset Generalization**: Improve transfer learning between different traffic scenarios
-- [ ] **Multi-agent Interaction**: Model complex multi-vehicle coordination scenarios
-
-### Low Priority
-- [ ] **Mobile Deployment**: Optimize for edge computing devices
-- [ ] **Synthetic Data Generation**: Create physics-based data augmentation
-- [ ] **Interactive Visualization**: Web-based force analysis tool
-- [ ] **API Development**: REST API for real-time predictions
 
 ## Contributing
 
@@ -431,7 +327,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-- **Rui Gan**: [email@wisc.edu](mailto:email@wisc.edu)
+- **Rui Gan**: [rgan6@wisc.edu](mailto:rgan6@wisc.edu)
 - **Haotian Shi**: [shihaotian95@tongji.edu.cn](mailto:shihaotian95@tongji.edu.cn) 
 - **Pei Li**: [pei.li@wisc.edu](mailto:pei.li@wisc.edu)
 
