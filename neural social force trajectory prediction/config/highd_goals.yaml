@@ -1,0 +1,27 @@
+learning_rate: 0.00003
+num_epochs: 35
+future_length: 62
+gpu_index: 0
+num_workers: 0
+past_length: 38
+time_step: 0.08
+train_b_size: 1024
+input_size: 4
+embedding_size: 64
+rnn_size: 256
+output_size: 16
+enc_dest_state_size:
+- 64
+- 256
+dec_tau_size:
+- 512
+- 256
+- 512
+
+
+
+
+
+
+
+
