@@ -100,79 +100,36 @@ python src/utils/visualization.py \
 ## Repository Structure
 
 ```
-vehicle-trajectory-prediction/
+GNP--Goal-based-Neural-Physics-Vehicle-Trajectory-/
 ├── README.md
-├── requirements.txt
-├── setup.py
 ├── LICENSE
+├── .gitignore
 │
-├── src/
-│   ├── __init__.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── gnp_model.py              # Main GNP model
-│   │   ├── goal_prediction.py        # Goal prediction sub-module
-│   │   ├── trajectory_prediction.py  # Neural social force sub-module
-│   │   └── baseline_models.py        # Baseline implementations
-│   │
-│   ├── data/
-│   │   ├── __init__.py
-│   │   ├── data_loader.py           # Dataset loading utilities
-│   │   ├── preprocessing.py         # Data preprocessing functions
-│   │   └── intention_clustering.py  # Intention mode extraction
-│   │
-│   ├── utils/
-│   │   ├── __init__.py
-│   │   ├── metrics.py               # Evaluation metrics (ADE, FDE, RMSE)
-│   │   ├── visualization.py         # Force visualization and plotting
-│   │   ├── physics.py               # Social force physics utilities
-│   │   └── config.py                # Configuration management
-│   │
-│   └── training/
-│       ├── __init__.py
-│       ├── train_goal_prediction.py # Goal prediction training
-│       ├── train_trajectory.py      # Trajectory prediction training
-│       └── train_gnp.py             # End-to-end training
+├── assets/                              # Project assets and visualizations
 │
-├── data/
-│   ├── raw/
-│   │   ├── highd/                   # HighD dataset
-│   │   └── ngsim/                   # NGSIM dataset
-│   ├── processed/                   # Preprocessed data
-│   └── intention_modes/             # Clustered intention patterns
+├── goal-prediction/                     # Goal Prediction Sub-module
+│   ├── config/
+│   │   └── __pycache__/                # Python cache files
+│   ├── HighD.py                        # HighD dataset processing for goal prediction
+│   ├── Ngsim.py                        # NGSIM dataset processing for goal prediction
+│   ├── loaddata.py                     # Data loading utilities for goal prediction
+│   ├── model.py                        # Goal prediction model implementation
+│   ├── train.py                        # Training script for goal prediction
+│   ├── transformer_decoder.py          # Transformer decoder implementation
+│   ├── transformer_encoder.py          # Transformer encoder implementation
+│   └── utils.py                        # Utility functions for goal prediction
 │
-├── models/
-│   ├── pretrained/                  # Pre-trained model weights
-│   ├── checkpoints/                 # Training checkpoints
-│   └── exported/                    # Exported models for deployment
-│
-├── notebooks/
-│   ├── data_exploration.ipynb       # Dataset analysis
-│   ├── intention_analysis.ipynb     # Intention mode visualization
-│   ├── model_evaluation.ipynb       # Performance evaluation
-│   └── force_visualization.ipynb    # Physics interpretation
-│
-├── experiments/
-│   ├── baseline_comparison/         # Baseline model experiments
-│   ├── ablation_studies/           # Component analysis
-│   └── generalization_tests/       # Cross-dataset evaluation
-│
-├── docs/
-│   ├── figures/                    # Paper figures and visualizations
-│   ├── api_reference.md            # API documentation
-│   ├── dataset_guide.md            # Dataset preparation guide
-│   └── model_details.md            # Detailed model explanation
-│
-├── tests/
-│   ├── test_data_processing.py     # Data pipeline tests
-│   ├── test_models.py              # Model functionality tests
-│   └── test_training.py            # Training pipeline tests
-│
-└── scripts/
-    ├── download_data.sh            # Dataset download script
-    ├── preprocess_data.py          # Data preprocessing script
-    ├── evaluate_model.py           # Model evaluation script
-    └── run_experiments.py          # Experiment runner
+└── neural social force trajectory prediction/    # Neural Social Force Sub-module
+    ├── config/
+    │   ├── righd_goals.yaml            # HighD dataset goals configuration
+    │   └── righd_rep.yaml              # HighD dataset repulsion configuration
+    ├── loaddata_goals.py               # Data loading for goal-based prediction
+    ├── loaddata_repulsion.py           # Data loading for repulsion modeling
+    ├── model_goals.py                  # Goal attraction force model
+    ├── model_repulsion.py              # Repulsion force model
+    ├── train_goals.py                  # Training script for goal attraction
+    ├── train_repulsion_fulltest.py     # Full testing for repulsion training
+    └── utils.py                        # Utility functions for trajectory prediction
 ```
 
 ## Installation
@@ -223,46 +180,6 @@ opencv-python>=4.5.0
 ```
 
 
-## Key Results
-
-### Performance Comparison (RMSE in meters)
-
-| Model | HighD Dataset |||||  NGSIM Dataset ||||| 
-|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
-|       | 1s | 2s | 3s | 4s | 5s | 1s | 2s | 3s | 4s | 5s |
-| S-LSTM | 0.22 | 0.62 | 1.27 | 2.15 | 3.41 | 0.65 | 1.31 | 2.16 | 3.25 | 4.55 |
-| CS-LSTM | 0.22 | 0.61 | 1.24 | 2.10 | 3.27 | 0.61 | 1.27 | 2.08 | 3.10 | 4.37 |
-| STDAN | 0.29 | 0.68 | 1.17 | 1.88 | 2.76 | 0.42 | 1.01 | 1.69 | 2.56 | 3.67 |
-| CDSTraj | 0.13 | 0.21 | 0.32 | 0.38 | 1.05 | 0.36 | 0.86 | 1.36 | 2.02 | 2.85 |
-| **GNP (Ours)** | **0.09** | **0.17** | **0.26** | **0.37** | **0.50** | **0.27** | **0.55** | **0.86** | **1.21** | **1.59** |
-
-### Computational Performance
-
-| Model | Batch Time (ms) | Per-Sample (ms) |
-|-------|-----------------|-----------------|
-| DenseTNT | 13,298.90 | 208.70 |
-| MultiPath++ | 175.36 | 2.74 |
-| **GNP (Ours)** | **2,348.68** | **36.71** |
-
-![Visualization Results](docs/figures/force_visualization.png)
-
-*Figure 2: Interpretable force analysis showing goal attraction (yellow) and repulsion forces (blue/black)*
-
-## Key Figures
-
-### Model Architecture
-![Architecture](docs/figures/model_architecture.png)
-
-### Intention Mode Clustering
-![Intention Modes](docs/figures/intention_modes.png)
-
-### Force Visualization Examples
-![Force Analysis](docs/figures/force_examples.png)
-
-### Performance Comparison
-![Results](docs/figures/performance_comparison.png)
-
-
 ## Datasets
 
 ### Supported Datasets
@@ -275,9 +192,10 @@ opencv-python>=4.5.0
 ### High Priority
 - ✅ **Goal Prediction sub-module**: Codes for transformer-based goal-prediction sub-module
 - ✅ **Neural Social Force Trajectory Prediction sub-module**: Codes for neural social force including attraction and repulsive force
-- ✅ **HighD dataset Support**: Support HighD dataset and data processing 
+- ✅ **HighD dataset Support**: Support HighD dataset and data processing
+- ✅ **Repository Structure**: Improve confidence estimation for safety-critical applications
 - 🚧 **NGSIM dataset Support**: Support NGSIM dataset and data processing
-- 🚧 **Repository Structure**: Improve confidence estimation for safety-critical applications
+- 🚧 **Data preprocessing**: Preprocessing raw data files
 - 🚧 **Installation**: Installation and implementation detail for data preparation, training, and evaluation
 
 ## Citation
@@ -299,9 +217,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
+For any questions or suggestions, please open an issue.
 - **Rui Gan**: [rgan6@wisc.edu](mailto:rgan6@wisc.edu)
-- **Haotian Shi**: [shihaotian95@tongji.edu.cn](mailto:shihaotian95@tongji.edu.cn) 
-- **Pei Li**: [pei.li@wisc.edu](mailto:pei.li@wisc.edu)
 
 ## Updates
 
