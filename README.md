@@ -218,6 +218,7 @@ For any questions or suggestions, please open an issue.
 
 - **2024-06-01**: Initial repository setup and model implementation
 - **2024-06-06**: Added comprehensive documentation and examples
+- 🔒 The full codebase and example datasets will be released upon acceptance of this paper. Stay tuned!
 
 ---
 
