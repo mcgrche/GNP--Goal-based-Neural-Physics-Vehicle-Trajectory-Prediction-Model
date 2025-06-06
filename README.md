@@ -41,45 +41,114 @@ The GNP model consists of two main sub-modules:
 
 ## Quick Start
 
-### 1. Data Preparation
+### Prerequisites
+- Download the HighD and/or NGSIM datasets
+- Ensure Python environment is set up with required dependencies
 
+### Step 1: Goal Prediction Sub-module
+
+#### 1.1 Data Preparation
 ```bash
-# Download and preprocess HighD dataset
-python scripts/download_data.sh --dataset highd
-python scripts/preprocess_data.py --dataset highd --output data/processed/
+# Navigate to goal-prediction directory
+cd goal-prediction/
 
-# Extract intention modes
-python src/data/intention_clustering.py --data data/processed/highd/ --n_clusters 200
+# Process and load data (creates train, validation, and test datasets)
+python loaddata.py
 ```
 
-### 2. Training
+#### 1.2 Train Goal Prediction Model
+```bash
+# Train the transformer-based goal prediction model
+python train.py
+```
+
+**Note**: The `train.py` script handles training, validation, and inference automatically. It will:
+- Train the goal prediction model using the processed data
+- Validate the model during training
+- Save the best model checkpoints
+- Perform inference on test data
+
+### Step 2: Neural Social Force Trajectory Prediction Sub-module
+
+#### 2.1 Train Goal Attraction Force (First Stage)
+```bash
+# Navigate to neural social force directory
+cd "neural social force trajectory prediction/"
+
+# Train only the goal attraction force component
+python train_goals.py
+```
+
+#### 2.2 Train Full Model with Repulsion Forces (Second Stage)
+```bash
+# Train the complete model with both attraction and repulsion forces
+python train_repulsion_fulltest.py
+```
+
+**Note**: The trajectory prediction follows a two-stage training approach:
+1. **Stage 1** (`train_goals.py`): Trains only the goal attraction force using the goals predicted from Step 1
+2. **Stage 2** (`train_repulsion_fulltest.py`): Trains the full model incorporating both goal attraction and repulsion forces for complete trajectory prediction
+
+### Step 3: Configuration (Optional)
+
+You can modify the training parameters by editing the configuration files:
 
 ```bash
-# Train goal prediction sub-module
-python src/training/train_goal_prediction.py \
-    --data_path data/processed/highd/ \
-    --intention_modes data/intention_modes/highd_200.pkl \
-    --epochs 100 \
-    --batch_size 64 \
-    --lr 0.001
+# Edit goal prediction configuration
+cd "neural social force trajectory prediction/config/"
 
-# Train trajectory prediction sub-module
-python src/training/train_trajectory.py \
-    --data_path data/processed/highd/ \
-    --goal_model models/checkpoints/goal_prediction_best.pth \
-    --epochs 150 \
-    --batch_size 32 \
-    --lr 0.0005
+# For HighD dataset goals configuration
+nano righd_goals.yaml
 
-# End-to-end fine-tuning
-python src/training/train_gnp.py \
-    --data_path data/processed/highd/ \
-    --pretrained_goal models/checkpoints/goal_prediction_best.pth \
-    --pretrained_traj models/checkpoints/trajectory_prediction_best.pth \
-    --epochs 50 \
-    --batch_size 16 \
-    --lr 0.0001
+# For HighD dataset repulsion configuration  
+nano righd_rep.yaml
 ```
+
+### Step 4: Dataset-Specific Processing
+
+If you want to use different datasets, run the appropriate dataset processing script:
+
+```bash
+# For HighD dataset
+cd goal-prediction/
+python HighD.py
+
+# For NGSIM dataset
+cd goal-prediction/
+python Ngsim.py
+```
+
+### Complete Training Pipeline
+
+Here's the complete sequence to train the GNP model from scratch:
+
+```bash
+# 1. Goal Prediction Sub-module
+cd goal-prediction/
+python loaddata.py        # Process data
+python train.py           # Train goal prediction
+
+# 2. Neural Social Force Sub-module  
+cd "../neural social force trajectory prediction/"
+python train_goals.py                    # Train attraction forces
+python train_repulsion_fulltest.py       # Train full model
+
+# 3. Model is now ready for inference
+```
+
+### Expected Outputs
+
+After running the complete pipeline:
+- **Goal Prediction**: Trained transformer model that predicts multiple potential goals
+- **Trajectory Prediction**: Complete neural social force model that generates full trajectories
+- **Model Checkpoints**: Saved in respective directories for future use
+- **Evaluation Results**: Performance metrics displayed during training and testing
+
+### Troubleshooting
+
+- **Data Loading Issues**: Ensure dataset paths are correctly set in the data loading scripts
+- **Memory Issues**: Reduce batch size in training scripts if encountering out-of-memory errors
+- **Configuration Errors**: Check YAML configuration files for proper formatting and parameter values
 
 ### 3. Evaluation
 
@@ -109,9 +178,9 @@ GNP--Goal-based-Neural-Physics-Vehicle-Trajectory-/
 │
 ├── goal-prediction/                     # Goal Prediction Sub-module
 │   ├── config/
-│   │   └── __pycache__/                # Python cache files
-│   ├── HighD.py                        # HighD dataset processing for goal prediction
-│   ├── Ngsim.py                        # NGSIM dataset processing for goal prediction
+│   │   ├── __pycache__/                # Python cache files
+    │   └── HighD.py                    # HighD dataset processing for goal prediction
+    │    └── Ngsim.py                    # NGSIM dataset processing for goal prediction
 │   ├── loaddata.py                     # Data loading utilities for goal prediction
 │   ├── model.py                        # Goal prediction model implementation
 │   ├── train.py                        # Training script for goal prediction
