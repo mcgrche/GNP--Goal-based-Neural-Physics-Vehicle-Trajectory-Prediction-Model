@@ -104,67 +104,6 @@ nano righd_goals.yaml
 nano righd_rep.yaml
 ```
 
-### Step 4: Dataset-Specific Processing
-
-If you want to use different datasets, run the appropriate dataset processing script:
-
-```bash
-# For HighD dataset
-cd goal-prediction/
-python HighD.py
-
-# For NGSIM dataset
-cd goal-prediction/
-python Ngsim.py
-```
-
-### Complete Training Pipeline
-
-Here's the complete sequence to train the GNP model from scratch:
-
-```bash
-# 1. Goal Prediction Sub-module
-cd goal-prediction/
-python loaddata.py        # Process data
-python train.py           # Train goal prediction
-
-# 2. Neural Social Force Sub-module  
-cd "../neural social force trajectory prediction/"
-python train_goals.py                    # Train attraction forces
-python train_repulsion_fulltest.py       # Train full model
-
-# 3. Model is now ready for inference
-```
-
-### Expected Outputs
-
-After running the complete pipeline:
-- **Goal Prediction**: Trained transformer model that predicts multiple potential goals
-- **Trajectory Prediction**: Complete neural social force model that generates full trajectories
-- **Model Checkpoints**: Saved in respective directories for future use
-- **Evaluation Results**: Performance metrics displayed during training and testing
-
-### Troubleshooting
-
-- **Data Loading Issues**: Ensure dataset paths are correctly set in the data loading scripts
-- **Memory Issues**: Reduce batch size in training scripts if encountering out-of-memory errors
-- **Configuration Errors**: Check YAML configuration files for proper formatting and parameter values
-
-### 3. Evaluation
-
-```bash
-# Evaluate on test set
-python scripts/evaluate_model.py \
-    --model_path models/pretrained/gnp_highd.pth \
-    --data_path data/processed/highd/test/ \
-    --output results/highd_evaluation.json
-
-# Generate visualizations
-python src/utils/visualization.py \
-    --model_path models/pretrained/gnp_highd.pth \
-    --data_path data/processed/highd/test/ \
-    --output_dir results/visualizations/
-```
 
 ## Repository Structure
 
