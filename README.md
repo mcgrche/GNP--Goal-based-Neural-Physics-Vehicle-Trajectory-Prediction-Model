@@ -119,7 +119,7 @@ GNP--Goal-based-Neural-Physics-Vehicle-Trajectory-/
 │   ├── config/
 │   │   ├── __pycache__/                # Python cache files
     │   └── HighD.py                    # HighD dataset processing for goal prediction
-    │    └── Ngsim.py                    # NGSIM dataset processing for goal prediction
+    │   └── Ngsim.py                    # NGSIM dataset processing for goal prediction
 │   ├── loaddata.py                     # Data loading utilities for goal prediction
 │   ├── model.py                        # Goal prediction model implementation
 │   ├── train.py                        # Training script for goal prediction
