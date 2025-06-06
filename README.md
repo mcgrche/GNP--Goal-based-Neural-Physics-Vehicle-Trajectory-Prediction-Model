@@ -147,51 +147,37 @@ GNP--Goal-based-Neural-Physics-Vehicle-Trajectory-/
 - CUDA-compatible GPU (recommended)
 - 8GB+ RAM
 
-### Setup Environment
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/vehicle-trajectory-prediction.git
-cd vehicle-trajectory-prediction
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install package in development mode
-pip install -e .
-```
-
 ### Dependencies
 
 ```bash
-# Core dependencies
-torch>=1.9.0
-numpy>=1.21.0
-pandas>=1.3.0
-scikit-learn>=1.0.0
-matplotlib>=3.5.0
-seaborn>=0.11.0
+# Create new conda environment
+conda create -n gnp python=3.8
 
-# Specific for trajectory prediction
-scipy>=1.7.0
-tqdm>=4.62.0
-tensorboard>=2.7.0
-h5py>=3.1.0
+# Activate environment
+conda activate gnp
 
-# Optional for visualization
-plotly>=5.0.0
-opencv-python>=4.5.0
+# Install PyTorch with CUDA support
+conda install pytorch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 pytorch-cuda=11.8 -c pytorch -c nvidia
+
+# Install core scientific packages
+conda install numpy=1.24.3 pandas=2.0.3 scipy=1.10.1 scikit-learn=1.3.0 matplotlib=3.7.2 seaborn=0.12.2
+
+# Install additional packages via pip
+pip install opencv-python==4.11.0.86 kornia==0.7.3 h5py==3.11.0 pyarrow==17.0.0 polars==1.8.2 pyyaml==6.0.1
 ```
+
+### GPU Support
+
+This project requires CUDA-compatible GPU for optimal performance. The environment is configured for:
+- **CUDA Version**: 11.8
+- **PyTorch**: 2.0.0 with CUDA support
+- **GPUs**: RTX 4080.
 
 
 ## Datasets
 
 ### Supported Datasets
-- **HighD**: German highway drone recordings (25 Hz, 420m sections)
+- **HighD**: German highway drone recordings
 - **NGSIM**: US highway camera data (10 Hz, I-80 & US-101)
 
 
@@ -231,7 +217,7 @@ For any questions or suggestions, please open an issue.
 ## Updates
 
 - **2024-06-01**: Initial repository setup and model implementation
-- **2024-06-01**: Added comprehensive documentation and examples
+- **2024-06-06**: Added comprehensive documentation and examples
 
 ---
 
